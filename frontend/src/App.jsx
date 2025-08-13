@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Navbar from "./components/Navbar"
 import Loader from "./components/Loader"
+import "./App.css"
 
 function App() {
   const [user, setUser] = useState(null)
