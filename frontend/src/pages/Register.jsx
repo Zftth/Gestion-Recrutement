@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../api";
 import { toast } from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -73,6 +74,12 @@ export default function Register() {
       >
         S'inscrire
       </button>
+      <p className="text-center mt-4 text-sm text-gray-600">
+        Déjà un compte ?{" "}
+        <Link to="/login" className="text-blue-600 hover:underline">
+          Se connecter
+        </Link>
+      </p>
     </form>
   );
 }
