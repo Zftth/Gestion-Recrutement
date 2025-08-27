@@ -20,11 +20,11 @@ class DocumentController extends Controller
         $documents = Document::where('application_id', $applicationId)->get();
 
         // Vérifier que l'utilisateur a le droit de voir ces documents
-        if ($user->role->name === 'admin') {
+        if ($user->role === 'admin') {
             return response()->json($documents);
         }
 
-        if ($user->role->name === 'recruteur') {
+        if ($user->role === 'recruteur') {
             $hasAccess = $documents->first() && $documents->first()->application->jobOffer->recruiter_id === $user->id;
             if (!$hasAccess) {
                 return response()->json(['message' => 'Accès refusé'], 403);
@@ -32,7 +32,7 @@ class DocumentController extends Controller
             return response()->json($documents);
         }
 
-        if ($user->role->name === 'candidat') {
+        if ($user->role === 'candidat') {
             $hasAccess = $documents->first() && $documents->first()->application->candidate_id === $user->id;
             if (!$hasAccess) {
                 return response()->json(['message' => 'Accès refusé'], 403);
@@ -51,7 +51,7 @@ class DocumentController extends Controller
         $user = Auth::user();
 
         // Seuls les candidats peuvent uploader un document pour leur propre candidature
-        if ($user->role->name !== 'candidat') {
+        if ($user->role !== 'candidat') {
             return response()->json(['message' => 'Seuls les candidats peuvent uploader des documents.'], 403);
         }
 
@@ -89,6 +89,11 @@ class DocumentController extends Controller
         }
 
         return Storage::disk('public')->download($document->path, $document->filename);
+    }
+
+     public function show($id)
+    {
+       
     }
 
     /**

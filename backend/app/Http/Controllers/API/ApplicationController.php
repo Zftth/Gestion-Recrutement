@@ -19,9 +19,9 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role->name === 'admin') {
+        if ($user->role === 'admin') {
             $applications = Application::with(['jobOffer', 'candidate'])->latest()->get();
-        } elseif ($user->role->name === 'recruteur') {
+        } elseif ($user->role === 'recruteur') {
             $applications = Application::whereHas('jobOffer', function ($query) use ($user) {
                 $query->where('recruiter_id', $user->id);
             })->with(['jobOffer', 'candidate'])->latest()->get();
@@ -39,7 +39,7 @@ class ApplicationController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->role->name !== 'candidat') {
+        if ($user->role !== 'candidat') {
             return response()->json(['message' => 'Seuls les candidats peuvent postuler.'], 403);
         }
 
@@ -62,9 +62,9 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         if (
-            $user->role->name === 'admin' ||
-            ($user->role->name === 'recruteur' && $application->jobOffer->recruiter_id === $user->id) ||
-            ($user->role->name === 'candidat' && $application->candidate_id === $user->id)
+            $user->role === 'admin' ||
+            ($user->role === 'recruteur' && $application->jobOffer->recruiter_id === $user->id) ||
+            ($user->role === 'candidat' && $application->candidate_id === $user->id)
         ) {
             return response()->json($application);
         }

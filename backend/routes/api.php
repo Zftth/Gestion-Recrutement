@@ -42,4 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // -------- DOCUMENTS --------
     Route::apiResource('documents', DocumentController::class);    
+    Route::prefix('applications/{applicationId}')->group(function () {
+    Route::get('/documents', [DocumentController::class, 'index']);
+    Route::post('/documents', [DocumentController::class, 'store']);
+});
 });

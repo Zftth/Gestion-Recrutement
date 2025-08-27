@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreInterviewRequest;
 use App\Models\Interview;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class InterviewController extends Controller
@@ -12,13 +14,12 @@ class InterviewController extends Controller
     /**
      * Liste des entretiens
      */
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-
-        if ($user->role->name === 'admin') {
+       $user = $request->user();
+        if ($user->role === 'admin') {
             $interviews = Interview::with('application.jobOffer', 'application.candidate')->latest()->get();
-        } elseif ($user->role->name === 'recruteur') {
+        } elseif ($user->role === 'recruteur') {
             $interviews = Interview::whereHas('application.jobOffer', function ($q) use ($user) {
                 $q->where('recruiter_id', $user->id);
             })->with('application.jobOffer', 'application.candidate')->latest()->get();

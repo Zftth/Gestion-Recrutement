@@ -8,7 +8,7 @@ export default function Documents() {
 
   const fetchDocs = async () => {
     try {
-      const res = await api.get("/documents");
+      const res = await api.get(`/applications/${applicationId}/documents`);
       setDocs(res.data);
     } catch {
       toast.error("Erreur lors du chargement des documents");
