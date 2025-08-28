@@ -9,7 +9,9 @@ import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import HomePage from "./pages/HomePage"; // 👈 ajoute ta nouvelle page
 
+// Layout pour les pages protégées (dashboard, etc.)
 function Layout({ children }) {
   return (
     <div className="flex h-screen">
@@ -28,7 +30,9 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/register" replace />} />
+        {/* Page d’accueil publique */}
+        <Route path="/" element={<HomePage />} />
+
         {/* Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -92,6 +96,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Redirection pour toutes les autres routes */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

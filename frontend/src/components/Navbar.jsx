@@ -1,28 +1,45 @@
 import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  };
-
   return (
-    <nav className="bg-gray-800 text-white px-6 py-3 flex justify-between items-center shadow-md">
-      <h1 className="text-xl font-bold">RecruitPro</h1>
+    <header className="bg-white shadow-md fixed top-0 w-full z-50">
+      <div className="container mx-auto flex justify-between items-center py-4 px-6">
+        
+        {/* Logo */}
+        <Link to="/" className="flex items-center space-x-2">
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="h-10 w-auto"
+          />
+          <span className="font-bold text-xl text-blue-600">RecrutApp</span>
+        </Link>
 
-      <div className="flex items-center gap-4">
-        <Link to="/dashboard" className="hover:text-blue-400">Dashboard</Link>
-        {user?.role === "admin" && <Link to="/users" className="hover:text-blue-400">Utilisateurs</Link>}
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 px-3 py-1 rounded hover:bg-red-600"
-        >
-          Déconnexion
-        </button>
+        {/* Liens */}
+        <nav className="hidden md:flex space-x-6 text-gray-700 font-medium">
+          <Link to="/" className="hover:text-blue-600 transition">Maison</Link>
+          <Link to="/jobs" className="hover:text-blue-600 transition">Trouver un emploi</Link>
+          <Link to="/about" className="hover:text-blue-600 transition">À propos</Link>
+          <Link to="/blogs" className="hover:text-blue-600 transition">Blogs</Link>
+          <Link to="/contact" className="hover:text-blue-600 transition">Contact</Link>
+        </nav>
+
+        {/* Boutons */}
+        <div className="space-x-3">
+          <Link
+            to="/login"
+            className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition"
+          >
+            Se connecter
+          </Link>
+          <Link
+            to="/register"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          >
+            Registre
+          </Link>
+        </div>
       </div>
-    </nav>
+    </header>
   );
 }
