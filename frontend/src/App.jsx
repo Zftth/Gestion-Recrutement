@@ -33,6 +33,7 @@ function App() {
         {/* Page d’accueil publique */}
         <Route path="/" element={<HomePage />} />
 
+        <Route path="/" element={<Navigate to="/register" replace />} />
         {/* Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
