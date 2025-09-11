@@ -20,13 +20,13 @@ class ApplicationController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-            $applications = Application::with(['jobOffer', 'candidate'])->latest()->get();
+            $applications = Application::with(['jobOffer', 'user'])->get();
         } elseif ($user->role === 'recruteur') {
             $applications = Application::whereHas('jobOffer', function ($query) use ($user) {
                 $query->where('recruiter_id', $user->id);
-            })->with(['jobOffer', 'candidate'])->latest()->get();
+            })->with(['jobOffer', 'user'])->latest()->get();
         } else {
-            $applications = Application::where('candidate_id', $user->id)->with(['jobOffer', 'candidate'])->latest()->get();
+            $applications = Application::where('user_id', $user->id)->with(['jobOffer', 'user'])->latest()->get();
         }
 
         return response()->json($applications);
@@ -45,13 +45,14 @@ class ApplicationController extends Controller
 
         $application = Application::create([
             'job_offer_id' => $request->job_offer_id,
-            'candidate_id' => $user->id,
+            'user_id' => $user->id,
             'status'       => 'reçue',
             'notes'        => $request->notes
         ]);
 
         return response()->json(['message' => 'Candidature envoyée avec succès', 'application' => $application], 201);
-    }
+
+       }
 
     /**
      * Voir une candidature
@@ -89,6 +90,9 @@ class ApplicationController extends Controller
         }
 
         $application->update($request->only('status', 'notes'));
+         if($application->status === 'acceptée') {
+           Mail::to($application->user->email)->send(new UserAcceptMail($application->user));
+    }
 
         return response()->json(['message' => 'Candidature mise à jour avec succès', 'application' => $application]);
     }

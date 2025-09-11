@@ -11,8 +11,8 @@ class ApplicationSeeder extends Seeder
     {
         Application::insert([
             [
-                'job_offer_id' => 1,
-                'candidate_id' => 3,
+                'job_offer_id' => 3,
+                'user_id' => 2,
                 'status' => 'reçue',
                 'notes' => 'Candidat motivé',
                 'created_at' => now(),

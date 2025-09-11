@@ -3,32 +3,27 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin Test',
-            'email' => 'admin@test.com',
-            'password' => Hash::make('password'),
-            'role_id' => 1
-        ]);
+        $adminRole = DB::table('roles')->where('name', 'admin')->first();
 
-        User::create([
-            'name' => 'Recruteur Test',
-            'email' => 'recruteur@test.com',
-            'password' => Hash::make('password'),
-            'role_id' => 2
-        ]);
+        // Vérifier si un admin existe déjà
+        $existingAdmin = DB::table('users')->where('role_id', $adminRole->id)->first();
 
-        User::create([
-            'name' => 'Candidat Test',
-            'email' => 'candidat@test.com',
-            'password' => '12345678',
-            'role_id' => 3
-        ]);
+        if (!$existingAdmin) {
+            DB::table('users')->insert([
+                'name' => 'Super Admin',
+                'email' => 'admin@admin.com',
+                'password' => Hash::make('12345678'),
+                'role_id' => $adminRole->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

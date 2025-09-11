@@ -11,7 +11,7 @@ class Application extends Model
 
     protected $fillable = [
         'job_offer_id',
-        'candidate_id',
+        'user_id',
         'status',
         'notes'
     ];
@@ -21,9 +21,9 @@ class Application extends Model
         return $this->belongsTo(JobOffer::class);
     }
 
-    public function candidate()
+    public function user()
     {
-        return $this->belongsTo(User::class, 'candidate_id');
+        return $this->belongsTo(User::class);
     }
 
     public function documents()

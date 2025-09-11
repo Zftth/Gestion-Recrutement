@@ -6,18 +6,45 @@ import {
   Calendar,
   Bell,
   UserCheck,
-  LogOut
+  MessageSquare,
 } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+
+  const getSidebarItems = (role) => {
+  const menuByRole = {
+    admin: [
+      { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard" },
+      { icon: Briefcase, label: "Offres d'emploi", path: "/job-offers" },
+      { icon: Users, label: "Candidatures", path: "/applications" },
+      { icon: Calendar, label: "Entretiens", path: "/interviews" },
+      { icon: Bell, label: "Notifications", path: "/notifications" },
+      { icon: UserCheck, label: "Documents", path: "/documents" },
+    ],
+    recruiter: [
+      { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/recruteur" },
+      { icon: Briefcase, label: "Mes Offres", path: "/job-offers" },
+      { icon: Users, label: "Candidatures", path: "/applications" },
+      { icon: Calendar, label: "Entretiens", path: "/interviews" },
+      { icon: MessageSquare, label: "Messages", path: "/messages" },
+    ],
+    candidate: [
+      { icon: LayoutDashboard, label: "Tableau de bord", path: "/dashboard/candidat" },
+      { icon: Briefcase, label: "Offres disponibles", path: "/job-offers" },
+      { icon: Users, label: "Mes Candidatures", path: "/applications" },
+      { icon: MessageSquare, label: "Messages", path: "/messages" },
+    ],
+  };
+
+  return menuByRole[role]; 
+};
+
 
 export default function Sidebar() {
-  const sidebarItems = [
-    { icon: LayoutDashboard, label: "Tableau de bord", active: true },
-    { icon: Briefcase, label: "Offres d'emploi" },
-    { icon: Users, label: "Candidatures" },
-    { icon: Calendar, label: "Entretiens" },
-    { icon: Bell, label: "Notifications", badge: 3 },
-    { icon: UserCheck, label: "Utilisateurs" }
-  ];
+  const location = useLocation();
+  const role = localStorage.getItem("role");
+  const sidebarItems = getSidebarItems(role); // récupère le rôle de l'utilisateur connecté
+console.log("📌 Menu généré pour ce rôle:", sidebarItems);
+
 
   return (
     <div className="w-72 bg-white shadow-sm border-r border-gray-200 flex flex-col">
@@ -34,32 +61,20 @@ export default function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
         {sidebarItems.map((item, index) => (
-          <button
+          <Link
             key={index}
+            to={item.path}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-              item.active
+              location.pathname === item.path
                 ? "bg-blue-50 text-blue-700 font-medium"
                 : "text-gray-600 hover:bg-gray-50"
             }`}
           >
             <item.icon className="w-5 h-5" />
             <span className="flex-1">{item.label}</span>
-            {item.badge && (
-              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[20px] text-center">
-                {item.badge}
-              </span>
-            )}
-          </button>
+          </Link>
         ))}
       </nav>
-
-      {/* Logout */}
-      <div className="p-4 border-t border-gray-200">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-          <LogOut className="w-5 h-5" />
-          <span>Se déconnecter</span>
-        </button>
-      </div>
     </div>
   );
 }

@@ -7,19 +7,13 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Run the database seeders.
+     * Seed the application's database.
      */
     public function run(): void
     {
-        // Appel de tous les seeders dans l'ordre
         $this->call([
             RoleSeeder::class,
             UserSeeder::class,
-            JobOfferSeeder::class,
-            ApplicationSeeder::class,
-            DocumentSeeder::class,
-            InterviewSeeder::class,
-            NotificationSeeder::class,
         ]);
     }
 }

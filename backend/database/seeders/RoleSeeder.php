@@ -3,16 +3,16 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        Role::insert([
+        DB::table('roles')->insert([
             ['name' => 'admin', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'recruteur', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'candidat', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'recruiter', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'candidate', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

@@ -33,7 +33,12 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Utilisateur créé avec succès',
-            'user'    => $user,
+            'user'    => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'role'  => $user->role->name, // ✅ nom du rôle
+            ],
             'token'   => $token
         ], 201);
     }
@@ -48,7 +53,7 @@ class AuthController extends Controller
             'password' => 'required|string'
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('role')->where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
@@ -64,7 +69,12 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Connexion réussie',
-            'user'    => $user,
+            'user'    => [
+                'id'    => $user->id,
+                'name'  => $user->name,
+                'email' => $user->email,
+                'role'  => $user->role->name, // ✅ renvoie admin / recruteur / candidat
+            ],
             'token'   => $token
         ]);
     }

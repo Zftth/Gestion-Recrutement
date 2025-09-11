@@ -1,25 +1,19 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Eye, EyeOff, User, Mail, Lock, UserCheck } from 'lucide-react';
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: ''
+    role_id: ''
   });
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
-
-  const roles = [
-    { value: '', label: 'Sélectionnez votre rôle' },
-    { value: 'administrateur', label: 'Administrateur' },
-    { value: 'candidat', label: 'Candidat' },
-    { value: 'recruteur', label: 'Recruteur' }
-  ];
+  const [roles, setRoles] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,8 +33,8 @@ const RegistrationForm = () => {
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Le nom complet est requis';
+    if (!formData.name.trim()) {
+      newErrors.name = 'Le nom complet est requis';
     }
     
     if (!formData.email.trim()) {
@@ -61,21 +55,67 @@ const RegistrationForm = () => {
       newErrors.confirmPassword = 'Les mots de passe ne correspondent pas';
     }
     
-    if (!formData.role) {
-      newErrors.role = 'Veuillez sélectionner un rôle';
+    if (!formData.role_id) {
+      newErrors.role_id = 'Veuillez sélectionner un rôle';
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      console.log('Données du formulaire:', formData);
-      alert('Inscription réussie !');
-      // Ici vous pouvez ajouter la logique pour envoyer les données au serveur
+  const fetchRoles = useCallback(async () => {
+  const res = await fetch("http://localhost:8000/api/roles", {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+      });
+  const data = await res.json();
+  setRoles(data);
+});
+
+useEffect(() => {
+ 
+  fetchRoles();
+}, [ fetchRoles]);
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (validateForm()) {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,   // correspond à ton champ Laravel
+          email: formData.email,
+          password: formData.password,
+          role_id: formData.role_id        // ⚡ à mapper correctement (voir étape 2)
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        alert("Inscription réussie !");
+        console.log("Nouvel utilisateur :", data);
+
+        // redirige vers login après inscription
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 500);
+      } else {
+        const error = await res.json();
+        alert("Erreur : " + (error.message || "Échec de l'inscription"));
+      }
+    } catch (err) {
+      console.error("Erreur API:", err);
     }
-  };
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
@@ -99,17 +139,17 @@ const RegistrationForm = () => {
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 w-5 h-5" />
               <input
                 type="text"
-                name="fullName"
-                value={formData.fullName}
+                name="name"
+                value={formData.name}
                 onChange={handleChange}
                 className={`w-full pl-12 pr-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 ${
-                  errors.fullName ? 'border-red-300' : 'border-blue-200'
+                  errors.name ? 'border-red-300' : 'border-blue-200'
                 }`}
                 placeholder="John Doe"
               />
             </div>
             {errors.fullName && (
-              <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
             )}
           </div>
 
@@ -202,21 +242,21 @@ const RegistrationForm = () => {
               Rôle
             </label>
             <select
-              name="role"
-              value={formData.role}
+              name="role_id"
+              value={formData.role_id}
               onChange={handleChange}
               className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 bg-white ${
-                errors.role ? 'border-red-300' : 'border-blue-200'
+                errors.role_id ? 'border-red-300' : 'border-blue-200'
               }`}
             >
               {roles.map(role => (
-                <option key={role.value} value={role.value}>
-                  {role.label}
+                <option key={role.id} value={role.id}>
+                  {role.name}
                 </option>
               ))}
             </select>
-            {errors.role && (
-              <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+            {errors.role_id && (
+              <p className="text-red-500 text-sm mt-1">{errors.role_id}</p>
             )}
           </div>
 

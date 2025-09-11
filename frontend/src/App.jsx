@@ -9,7 +9,12 @@ import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import HomePage from "./pages/HomePage"; // 👈 ajoute ta nouvelle page
+import HomePage from "./pages/HomePage";
+import Statistics from "./pages/Statistics";
+import MessagingPage from "./pages/MessagePage";
+import Contact from "./pages/contact";
+import About from "./pages/About";
+import BlogPage from "./pages/BlogPage"; // Assurez-vous que le chemin est correct
 
 // Layout pour les pages protégées (dashboard, etc.)
 function Layout({ children }) {
@@ -30,7 +35,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Page d’accueil publique */}
+        {/* Page d'accueil publique */}
         <Route path="/" element={<HomePage />} />
 
         {/* Auth */}
@@ -48,6 +53,22 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
+        {/* Pages publiques */}
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/blogs" element={<BlogPage />} /> {/* 👈 J'ai ajouté la route BlogPage ici */}
+      
+        <Route
+          path="/messages"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <MessagingPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Job Offers */}
         <Route
@@ -56,6 +77,17 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <JobOffers />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/statistics"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Statistics />
               </Layout>
             </ProtectedRoute>
           }

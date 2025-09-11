@@ -6,7 +6,9 @@ use App\Http\Controllers\API\JobOfferController;
 use App\Http\Controllers\API\ApplicationController;
 use App\Http\Controllers\API\InterviewController;
 use App\Http\Controllers\API\DocumentController;
-
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\API\MessageController;
+use App\Http\Controllers\API\UserController;
 /*
 |--------------------------------------------------------------------------
 | Routes API
@@ -19,9 +21,21 @@ use App\Http\Controllers\API\DocumentController;
 // ----------------------
 // Routes PUBLIQUES
 // ----------------------
+Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/messages/send', [MessageController::class, 'sendMessage']);
+    Route::get('/messages/conversation/{userId}', [MessageController::class, 'getConversation']);
+    Route::put('/messages/read/{userId}', [MessageController::class, 'markAsRead']);
+});
+
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
+Route::post('/reset', [AuthController::class, 'reset']);
+Route::get('/roles', function() {
+    return Role::all();
+});
 // ----------------------
 // Routes PROTÉGÉES
 // ----------------------
