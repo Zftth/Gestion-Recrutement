@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset', [AuthController::class, 'reset']);
+Route::get('/jobs-offers', [JobOfferController::class, 'index']);
 Route::get('/roles', function() {
     return Role::all();
 });

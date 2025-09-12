@@ -14,7 +14,12 @@ class JobOffer extends Model
         'title',
         'description',
         'location',
-        'tags',
+        'requirements',
+        'salary',
+        'contract_type',
+        'experience' ,
+        'company',
+        'type' ,
         'status'
     ];
 

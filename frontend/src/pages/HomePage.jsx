@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 export default function HomePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [jobOffers, setJobOffers] = useState([]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -13,6 +14,23 @@ export default function HomePage() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+    useEffect(() => {
+      const fetchOffers = async () => {
+        try {
+          const res = await fetch("http://localhost:8000/api/jobs-offers", {
+            headers: {
+              "Content-Type": "application/json",
+            }
+          });
+          const data = await res.json();
+          setJobOffers(data);
+        } catch (err) {
+          console.error("Erreur récupération offres:", err);
+        } 
+      };
+      fetchOffers();
+    }, []);
 
   // Données fictives pour les catégories d'emplois
   const jobCategories = [
@@ -24,50 +42,7 @@ export default function HomePage() {
     { id: 6, name: "Service Client", count: 145, icon: "🤝" },
   ];
 
-  // Données fictives pour les emplois récents
-  const recentJobs = [
-    { 
-      id: 1, 
-      title: "Développeur Frontend React", 
-      company: "TechSolutions Inc.", 
-      location: "Lomé, Togo", 
-      type: "Temps plein", 
-      salary: "45K-60K FCFA", 
-      posted: "Il y a 2 jours",
-      logo: "/company-logo-1.png" 
-    },
-    { 
-      id: 2, 
-      title: "Designer UX/UI", 
-      company: "CreativeStudio", 
-      location: "Lomé, Togo", 
-      type: "Temps plein", 
-      salary: "40K-55K FCFA", 
-      posted: "Il y a 3 jours",
-      logo: "/company-logo-2.png" 
-    },
-    { 
-      id: 3, 
-      title: "Spécialiste Marketing Digital", 
-      company: "GrowthExperts", 
-      location: "Lomé, Togo", 
-      type: "Temps partiel", 
-      salary: "35K-45K FCFA", 
-      posted: "Il y a 5 jours",
-      logo: "/company-logo-3.png" 
-    },
-    { 
-      id: 4, 
-      title: "Comptable", 
-      company: "FinancePlus", 
-      location: "Lomé, Togo", 
-      type: "Temps plein", 
-      salary: "38K-50K FCFA", 
-      posted: "Il y a 1 semaine",
-      logo: "/company-logo-4.png" 
-    },
-  ];
-
+  
   return (
     <div className="font-sans text-gray-800">
       {/* Navbar */}
@@ -225,29 +200,28 @@ export default function HomePage() {
           <h3 className="text-xl text-center mb-12 text-gray-600">Offres d'emploi en vedette</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {recentJobs.map((job) => (
-              <div key={job.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
+            {jobOffers.map((offer) => (
+              <div key={offer.id} className="bg-white p-6 rounded-lg shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{offer.title}</h3>
                     <div className="flex items-center mt-2">
-                      <span className="text-blue-600 font-medium">{job.company}</span>
+                      <span className="text-blue-600 font-medium">{offer.company}</span>
                       <span className="mx-2 text-gray-400">•</span>
-                      <span className="text-gray-600">{job.location}</span>
+                      <span className="text-gray-600">{offer.location}</span>
                     </div>
                   </div>
-                  <img src={job.logo} alt={`Logo de ${job.company}`} className="h-12 w-12 object-contain rounded" />
                 </div>
                 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">{job.type}</span>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">{job.salary}</span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">{offer.type}</span>
+                  <span className="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">{offer.salary}</span>
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 text-sm">{job.posted}</span>
+                  <span className="text-gray-500 text-sm">{offer.posted}</span>
                   <Link 
-                    to={`/jobs/${job.id}`}
+                    to={`/jobs/${offer.id}`}
                     className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Postuler

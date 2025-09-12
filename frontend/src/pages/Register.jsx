@@ -99,7 +99,6 @@ useEffect(() => {
 
       if (res.ok) {
         const data = await res.json();
-        alert("Inscription réussie !");
         console.log("Nouvel utilisateur :", data);
 
         // redirige vers login après inscription

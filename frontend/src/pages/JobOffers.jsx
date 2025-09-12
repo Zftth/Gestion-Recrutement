@@ -1,44 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Eye, Edit, Trash2, ArrowLeft, Save, X } from 'lucide-react';
 
 const JobOffersApp = () => {
-  const [currentView, setCurrentView] = useState('list'); // 'list' or 'create'
-  const [jobOffers, setJobOffers] = useState([
-    {
-      id: 1,
-      title: 'Développeur Frontend React',
-      description: 'Nous recherchons un développeur Frontend expérimenté...',
-      status: 'ouverte',
-      candidates: 12,
-      dateCreated: '01/01/2024'
-    },
-    {
-      id: 2,
-      title: 'Designer UX/UI Senior',
-      description: 'Rejoignez notre équipe design pour créer des expériences...',
-      status: 'ouverte',
-      candidates: 8,
-      dateCreated: '05/01/2024'
-    },
-    {
-      id: 3,
-      title: 'Chef de Projet Digital',
-      description: 'Nous cherchons un chef de projet pour piloter nos...',
-      status: 'fermée',
-      candidates: 15,
-      dateCreated: '20/12/2023'
-    }
-  ]);
+  const [currentView, setCurrentView] = useState('list'); 
+  const [jobOffers, setJobOffers] = useState([]);
+  const API_URL = "http://localhost:8000/api/job-offers";
+  const [newOffer, setNewOffer] = useState({ title: "", description: "", requirements: "", salary: "", location: "", contractType: "", experience: "", company: "", type: ""});
 
-  const [newOffer, setNewOffer] = useState({
-    title: '',
-    description: '',
-    requirements: '',
-    salary: '',
-    location: '',
-    contractType: '',
-    experience: ''
-  });
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        const res = await fetch(API_URL, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}` 
+          }
+        });
+        const data = await res.json();
+        setJobOffers(data);
+      } catch (err) {
+        console.error("Erreur récupération offres:", err);
+      } 
+    };
+    fetchOffers();
+  }, []);
 
   const getStatusBadge = (status) => {
     if (status === 'ouverte') {
@@ -59,60 +44,106 @@ const JobOffersApp = () => {
     alert(`Voir l'offre ${id}`);
   };
 
-  const handleEdit = (id) => {
-    alert(`Modifier l'offre ${id}`);
-  };
+  const handleEdit = async (id, updatedOffer) => {
+  try {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      body: JSON.stringify(updatedOffer)
+    });
 
-  const handleDelete = (id) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette offre ?')) {
-      setJobOffers(jobOffers.filter(offer => offer.id !== id));
+    const data = await res.json();
+
+    if (res.ok) {
+      setJobOffers(jobOffers.map(offer => offer.id === id ? data.offer : offer));
+      alert("Offre mise à jour avec succès !");
+    } else {
+      alert("Erreur: " + data.message);
     }
-  };
+  } catch (err) {
+    console.error("Erreur modification offre:", err);
+  }
+};
+
+
+  const handleDelete = async (id) => {
+  if (!window.confirm("Êtes-vous sûr de vouloir supprimer cette offre ?")) return;
+
+  try {
+    const res = await fetch(`${API_URL}/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setJobOffers(jobOffers.filter(offer => offer.id !== id));
+      alert(data.message);
+    } else {
+      alert("Erreur: " + data.message);
+    }
+  } catch (err) {
+    console.error("Erreur suppression offre:", err);
+  }
+};
+
 
   const handleCreateOffer = () => {
     setCurrentView('create');
   };
 
-  const handleSaveOffer = () => {
-    if (!newOffer.title || !newOffer.description) {
-      alert('Veuillez remplir au moins le titre et la description');
-      return;
-    }
+ const handleSaveOffer = async () => {
+  if (!newOffer.title || !newOffer.description) {
+    alert("Veuillez remplir au moins le titre et la description");
+    return;
+  }
+ 
 
-    const offer = {
-      id: Date.now(),
-      title: newOffer.title,
-      description: newOffer.description,
-      status: 'ouverte',
-      candidates: 0,
-      dateCreated: new Date().toLocaleDateString('fr-FR')
-    };
-
-    setJobOffers([...jobOffers, offer]);
-    setNewOffer({
-      title: '',
-      description: '',
-      requirements: '',
-      salary: '',
-      location: '',
-      contractType: '',
-      experience: ''
+  try {
+    const res = await fetch("http://localhost:8000/api/job-offers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}` 
+      },
+      body: JSON.stringify({
+        title: newOffer.title,
+        description: newOffer.description,
+        location: newOffer.location,
+       requirements: newOffer.requirements, 
+        salary: newOffer.salary,
+        contractType: newOffer.contractType,
+        experience: newOffer.experience,
+        company: newOffer.company,
+        type: newOffer.type
+      })
     });
-    setCurrentView('list');
-    alert('Offre créée avec succès !');
-  };
+
+    const data = await res.json();
+
+    if (res.ok) {
+      setJobOffers([...jobOffers, data.offer]); 
+      setCurrentView("list");
+      setNewOffer({ title: "", description: "", requirements: "", salary: "", location: "", contractType: "", experience: "", company: "", type: ""});
+      fetchOffers();
+    } else {
+      alert("Erreur: " + data.message);
+    }
+  } catch (err) {
+    console.error("Erreur création offre:", err);
+  }
+};
+
 
   const handleCancel = () => {
     setCurrentView('list');
-    setNewOffer({
-      title: '',
-      description: '',
-      requirements: '',
-      salary: '',
-      location: '',
-      contractType: '',
-      experience: ''
-    });
+    setNewOffer({ title: '', description: '', requirements: '', salary: '', location: '', contractType: '', experience: '', company: '', type: ''});
   };
 
   if (currentView === 'create') {
@@ -236,6 +267,32 @@ const JobOffersApp = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Ex: 45-55k€"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Entreprise
+                  </label>
+                  <input
+                    type="text"
+                    value={newOffer.company}
+                    onChange={(e) => setNewOffer({...newOffer, company: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder=""
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    Type
+                  </label>
+                  <select
+                    value={newOffer.type}
+                    onChange={(e) => setNewOffer({...newOffer, type: e.target.value})}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Sélectionner</option>
+                    <option value="Temps partiel">Temps partiel</option>
+                    <option value="Temps plien">Temps plein</option>
+                  </select>
                 </div>
               </div>
             </div>
